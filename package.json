@@ -1,0 +1,27 @@
+{
+  "name": "Carousel",
+  "version": "1.0.0",
+  "description": "Carousel",
+  "author": "Sergey Fesenko <sfesenko@live.ru>",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "assert-plus": "^0.1.5",
+    "browserify": "^11.0.1",
+    "del": "^1.2.0",
+    "gulp": "^3.9.0",
+    "gulp-util": "^3.0.6",
+    "gulp-webserver": "^0.9.1",
+    "javascript-state-machine": "git://github.com/jakesgordon/javascript-state-machine",
+    "jquery": "^2.1.4",
+    "pixi.js": "git://github.com/pixijs/pixi.js",
+    "q": "^1.4.1",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.3.1"
+  },
+  "devDependencies": {}
+}

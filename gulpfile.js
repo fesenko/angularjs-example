@@ -7,6 +7,7 @@ var buffer = require('vinyl-buffer');
 var watchify = require('watchify');
 var browserify = require('browserify');
 var sass = require('gulp-sass');
+var KarmaServer = require('karma').Server;
 
 var htmlFilesMask = './src/**/*.html';
 var vendors = [
@@ -53,6 +54,13 @@ gulp.task('html', ['cleanBuildDir'], function(){
 
 gulp.task('cleanBuildDir', function(cb) {
 	del(['./build/**/*.*'], cb);
+});
+
+gulp.task('unit-tests', function(done){
+  new KarmaServer({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, done).start();
 });
 
 gulp.task('sass', function () {

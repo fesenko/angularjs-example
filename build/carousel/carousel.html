@@ -1,0 +1,11 @@
+<div>
+    <div>
+        <button ng-click="play()">Play</button>
+    </div>
+    <div class="slides">
+        <div ng-repeat="slide in slides" ng-switch="slide.type">
+            <image-slide ng-switch-when="image" src="slide.src" active="slide.active" class="slide"></image-slide>
+            <video-slide ng-switch-when="video" src="slide.src" active="slide.active" class="slide"></video-slide>
+        </div>
+    </div>
+</div>

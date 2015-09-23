@@ -6,29 +6,28 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var watchify = require('watchify');
 var browserify = require('browserify');
+var sass = require('gulp-sass');
 
 var htmlFilesMask = './src/**/*.html';
-var libs = [
-	'pixi.js',
-	'assert-plus',
-	'javascript-state-machine',
-	'q'
+var vendors = [
+	'angular',
+	'angular-ui-router'
 ];
 
 var browserifyOpts = {
-	entries: ['./src/index.js'],
+	entries: ['./src/app.js'],
 	debug: true
 }
 
 var b =
 	browserify(browserifyOpts)
-	.external(libs)
+	.external(vendors)
 b = watchify(b)
 
 function compileCode() {
 	b.bundle()
 	.on('error', gutil.log.bind(gutil, 'Browserify Error'))
-	.pipe(source('index.js'))
+	.pipe(source('app.js'))
 	.pipe(buffer())
 	.pipe(gulp.dest('./build'))
 }
@@ -36,11 +35,11 @@ function compileCode() {
 b.on('update', compileCode)
 b.on('log', gutil.log)
 
-gulp.task('libs', ['cleanBuildDir'], function() {
+gulp.task('vendors', ['cleanBuildDir'], function() {
 	browserify({})
-	.require(libs)
+	.require(vendors)
 	.bundle()
-	.pipe(source('libs.js'))
+	.pipe(source('vendors.js'))
 	.pipe(gulp.dest('./build'))
 });
 
@@ -52,17 +51,17 @@ gulp.task('html', ['cleanBuildDir'], function(){
 	.pipe(gulp.dest('./build'))
 });
 
-gulp.task('media', ['cleanBuildDir'], function(){
-	gulp
-	.src('./media/**/*')
-	.pipe(gulp.dest('./build/media'))
-});
-
 gulp.task('cleanBuildDir', function(cb) {
 	del(['./build/**/*.*'], cb);
 });
 
-gulp.task('build', ['compileCode', 'html', 'libs', 'media']);
+gulp.task('sass', function () {
+  gulp.src('./src/styles.scss')
+    .pipe(sass.sync().on('error', sass.logError))
+    .pipe(gulp.dest('./build'));
+});
+
+gulp.task('build', ['compileCode', 'html', 'vendors', 'sass']);
 
 gulp.task('webserver', ['build'], function(){
 	gulp

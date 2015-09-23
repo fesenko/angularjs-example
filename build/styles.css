@@ -1,0 +1,11 @@
+.slides {
+  position: relative; }
+
+.slide {
+  position: absolute;
+  opacity: 0;
+  -webkit-transition: all linear 1s;
+  transition: all linear 1s; }
+
+.slide.active {
+  opacity: 1; }

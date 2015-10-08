@@ -1,11 +1,11 @@
-<div>
-    <div>
-        <button ng-click="play()">Play</button>
-    </div>
-    <div class="slides">
-        <div ng-repeat="slide in slides" ng-switch="slide.type">
-            <image-slide ng-switch-when="image" src="slide.src" active="slide.active" class="slide"></image-slide>
-            <video-slide ng-switch-when="video" src="slide.src" active="slide.active" class="slide"></video-slide>
-        </div>
+<screensaver ng-click="play()" ng-hide="isPlaying"></screensaver>
+<div class="slides" ng-click="stop()">
+    <div ng-repeat="slide in slides" ng-switch="slide.type">
+        <image-slide ng-switch-when="photo" src="slide.url" active="slide.active"
+            preload="slide.preload" ended="goNext()" transition="slide.transition"
+            transition-duration="slide.transitionDuration" class="slide"></image-slide>
+        <video-slide ng-switch-when="video" src="slide.url" active="slide.active"
+            preload="slide.preload" transition-duration="slide.transitionDuration"
+            transition="slide.transition" ended="goNext()" class="slide"></video-slide>
     </div>
 </div>

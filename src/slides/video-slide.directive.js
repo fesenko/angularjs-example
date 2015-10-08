@@ -1,48 +1,90 @@
 'use strict';
 
 var angular = require('angular');
+var transitionTimingFunctions = {
+    fadeOut: 'linear',
+    jumpCut: 'unset'
+};
 
-module.exports = function($timeout) {
+module.exports = function($timeout, $animate) {
     return {
         restrict: 'E',
-        require: '^carousel',
         scope: {
             src: '=?',
-            active: '=?'
+            ended: '&',
+            active: '=?',
+            preload: '=?',
+            transition: '=?',
+            transitionDuration: '=?'
         },
-        templateUrl: '/slides/video-slide.html',
-        link: function(scope, element, attrs, carouselCtrl) {
-            var activeClassName = 'active';
+        templateUrl: 'slides/video-slide.html',
+        link: function(scope, element, attrs) {
             var $elem = angular.element(element);
-            var $video = $elem.find('video');
-            var video = $video[0];
-            var canPlay = false;
+            var transition = scope.transition || 'jumpCut';
+            var timingFunc = transitionTimingFunctions[transition];
+            var transitionDuration = scope.transitionDuration || 1;
+            var $video;
 
-            $video.on('canplaythrough', function() {
-                canPlay = true;
-                video.pause();
-            });
+            function removeEventListeners() {
+                $video.one('ended');
+                $video.one('error');
+                $video.one('canplaythrough');
+            }
 
-            $video.on('ended', function() {
-                video.currentTime = 0;
+            function addEventListeners() {
+                $video.one('ended', onEnded);
+                $video.one('error', onEnded);
+                $video.one('canplaythrough', onCanplay);
+            }
+
+            function onEnded() {
                 $timeout(function() {
-                    carouselCtrl.goNext();
+                    $animate.animate(element, {opacity: 1}, {opacity: 0})
+                    .then(function() {
+                        removeEventListeners();
+                        scope.canPlay = false;
+                        $video = null;
+                        scope.ended();
+                    });
                 }, 0);
-            });
+            }
 
-            scope.$watch(function() {
-                return canPlay && scope.active;
-            }, function(value) {
-                if (value) {
-                    video.play();
-                }
-            });
+            function onCanplay() {
+                scope.canPlay = true;
+            }
 
             scope.$watch('active', function(active) {
                 if (active) {
-                    $elem.addClass(activeClassName);
+                    $elem.css({
+                        zIndex: 2,
+                        visibility: 'visible',
+                        transition: 'opacity ' + timingFunc + ' ' + transitionDuration + 's'
+                    });
                 } else {
-                    $elem.removeClass(activeClassName);
+                    $elem.css({
+                        zIndex: 0,
+                        opacity: 1,
+                        visibility: 'hidden'
+                    });
+                }
+            });
+
+            scope.$watch('preload', function(preload) {
+                if (preload) {
+                    $elem.css({
+                        zIndex: 1,
+                        visibility: 'hidden'
+                    });
+                    $video = $elem.find('video');
+                    addEventListeners();
+                }
+            });
+
+            scope.$watch(function() {
+                return scope.canPlay && scope.active;
+            }, function(value) {
+                if (value) {
+                    $video[0].play();
                 }
             });
         }

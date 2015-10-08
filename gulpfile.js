@@ -12,7 +12,9 @@ var KarmaServer = require('karma').Server;
 var htmlFilesMask = './src/**/*.html';
 var vendors = [
 	'angular',
-	'angular-ui-router'
+    'angular-mocks',
+    'angular-ui-router',
+    'angular-animate'
 ];
 
 var browserifyOpts = {
@@ -69,7 +71,13 @@ gulp.task('sass', function () {
     .pipe(gulp.dest('./build'));
 });
 
-gulp.task('build', ['compileCode', 'html', 'vendors', 'sass']);
+gulp.task('images', function() {
+    gulp
+    .src('img/**/*.*')
+    .pipe(gulp.dest('./build/img'));
+});
+
+gulp.task('build', ['compileCode', 'html', 'vendors', 'sass', 'images']);
 
 gulp.task('webserver', ['build'], function(){
 	gulp

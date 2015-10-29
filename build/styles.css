@@ -36,6 +36,7 @@ screensaver.ng-hide {
   text-align: center; }
   .slide img, .slide video {
     display: inline-block;
+    margin: 0 auto 0 auto;
     width: auto;
     height: 100%; }
 

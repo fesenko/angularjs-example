@@ -11,7 +11,9 @@ module.exports = function($timeout, $animate) {
         restrict: 'E',
         scope: {
             src: '=?',
+            loop: '=?',
             ended: '&',
+            loaded: '&',
             active: '=?',
             preload: '=?',
             transition: '=?',
@@ -26,9 +28,9 @@ module.exports = function($timeout, $animate) {
             var $video;
 
             function removeEventListeners() {
-                $video.one('ended');
-                $video.one('error');
-                $video.one('canplaythrough');
+                $video.off('ended');
+                $video.off('error');
+                $video.off('canplaythrough');
             }
 
             function addEventListeners() {
@@ -43,7 +45,9 @@ module.exports = function($timeout, $animate) {
                     .then(function() {
                         removeEventListeners();
                         scope.canPlay = false;
+                        $video.removeAttr('src');
                         $video = null;
+                        scope.preload = false;
                         scope.ended();
                     });
                 }, 0);
@@ -51,40 +55,63 @@ module.exports = function($timeout, $animate) {
 
             function onCanplay() {
                 scope.canPlay = true;
+                scope.$digest();
             }
 
-            scope.$watch('active', function(active) {
-                if (active) {
-                    $elem.css({
-                        zIndex: 2,
-                        visibility: 'visible',
-                        transition: 'opacity ' + timingFunc + ' ' + transitionDuration + 's'
-                    });
-                } else {
+            function preloadVideo() {
+                $elem.css({zIndex: 1});
+                $video = $elem.find('video');
+                addEventListeners();
+                $video.attr('src', scope.src);
+            }
+
+            scope.$watch('active', function(val) {
+                if (val !== true) {
                     $elem.css({
                         zIndex: 0,
-                        opacity: 1,
-                        visibility: 'hidden'
+                        opacity: 1
                     });
+                    return;
                 }
+
+                if (!scope.preload) {
+                    preloadVideo();
+                }
+
+                if (scope.loop) {
+                    $video.attr('loop', '');
+                }
+
+                $elem.css({
+                    zIndex: 2,
+                    transition: 'opacity ' + timingFunc + ' ' + transitionDuration + 's'
+                });
             });
 
-            scope.$watch('preload', function(preload) {
-                if (preload) {
-                    $elem.css({
-                        zIndex: 1,
-                        visibility: 'hidden'
-                    });
-                    $video = $elem.find('video');
-                    addEventListeners();
+            scope.$watch('preload', function(val) {
+                if (val) {
+                    preloadVideo();
                 }
             });
 
             scope.$watch(function() {
                 return scope.canPlay && scope.active;
-            }, function(value) {
-                if (value) {
+            }, function(val) {
+                if (val) {
                     $video[0].play();
+                    scope.loaded();
+                }
+            });
+
+            scope.$watch('loop', function(val) {
+                if (!$video) {
+                    return;
+                }
+
+                if (val) {
+                    $video.attr('loop', '');
+                } else {
+                    $video.removeAttr('loop');
                 }
             });
         }

@@ -1,7 +1,5 @@
 'use strict';
 
-var angular = require('angular');
-
 module.exports = function() {
     return {
         restrict: 'E',
@@ -9,7 +7,7 @@ module.exports = function() {
             slides: '=?'
         },
         templateUrl: 'carousel/carousel.html',
-        controller: function($scope) {
+        controller: function($scope, $timeout) {
             var currentIndex = -1;
             var currentSlide = null;
             var nextIndex = -1;
@@ -26,24 +24,39 @@ module.exports = function() {
 
                 currentIndex = 0;
                 currentSlide = $scope.slides[currentIndex];
+                currentSlide.active = true;
 
-                nextIndex = getNextIndex();
-                nextSlide = $scope.slides[nextIndex];
-
-                angular.extend(currentSlide, {active: true});
-                angular.extend(nextSlide, {preload: true});
+                if (count > 1) {
+                    nextIndex = getNextIndex();
+                    nextSlide = $scope.slides[nextIndex];
+                } else {
+                    currentSlide.loop = true;
+                }
 
                 $scope.isPlaying = true;
             };
 
             $scope.stop = function() {
                 $scope.isPlaying = false;
-                angular.extend(currentSlide, {active: false});
-                angular.extend(nextSlide, {preload: false});
+
+                if (currentSlide) {
+                    delete currentSlide.active;
+                    delete currentSlide.loop;
+                }
+
                 currentSlide = null;
                 currentIndex = -1;
                 nextSlide = null;
                 nextIndex = -1;
+            };
+
+            $scope.preloadNextSlide = function () {
+                if (nextSlide) {
+                    $timeout(function() {
+                        nextSlide.preload = true;
+                    }, 500);
+                }
+
             };
 
             function getNextIndex() {
@@ -62,8 +75,7 @@ module.exports = function() {
                     return;
                 }
 
-                angular.extend(currentSlide, {active: false});
-                angular.extend(nextSlide, {preload: false});
+                delete currentSlide.active;
 
                 currentIndex = nextIndex;
                 currentSlide = nextSlide;
@@ -71,8 +83,7 @@ module.exports = function() {
                 nextIndex = getNextIndex();
                 nextSlide = $scope.slides[nextIndex];
 
-                angular.extend(nextSlide, {preload: true});
-                angular.extend(currentSlide, {active: true});
+                currentSlide.active = true;
             };
         }
     };

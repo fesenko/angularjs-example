@@ -3,9 +3,11 @@
     <div ng-repeat="slide in slides" ng-switch="slide.type">
         <image-slide ng-switch-when="photo" src="slide.url" active="slide.active"
             preload="slide.preload" ended="goNext()" transition="slide.transition"
-            transition-duration="slide.transitionDuration" class="slide"></image-slide>
+            loop="slide.loop" transition-duration="slide.transitionDuration"
+            loaded="preloadNextSlide()" class="slide"></image-slide>
         <video-slide ng-switch-when="video" src="slide.url" active="slide.active"
             preload="slide.preload" transition-duration="slide.transitionDuration"
-            transition="slide.transition" ended="goNext()" class="slide"></video-slide>
+            transition="slide.transition" ended="goNext()" loop="slide.loop"
+            loaded="preloadNextSlide()" class="slide"></video-slide>
     </div>
 </div>

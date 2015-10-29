@@ -15,7 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'src/**/*.test.js'
+        'src/**/*.test.js',
+        'src/**/*.html'
     ],
 
 
@@ -27,9 +28,13 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'src/**/*.js': [ 'browserify' ]
+        'src/**/*.js': [ 'browserify' ],
+        'src/**/*.html': ['ng-html2js']
     },
 
+    ngHtml2JsPreprocessor: {
+        stripPrefix: 'src/'
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'

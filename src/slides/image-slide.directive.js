@@ -11,7 +11,9 @@ module.exports = function($timeout, $animate) {
         restrict: 'E',
         scope: {
             src: '=?',
+            loop: '=?',
             ended: '&',
+            loaded: '&',
             active: '=?',
             preload: '=?',
             duration: '=?',
@@ -25,39 +27,52 @@ module.exports = function($timeout, $animate) {
             var transition = scope.transition || 'jumpCut';
             var timingFunc = transitionTimingFunctions[transition];
             var transitionDuration = scope.transitionDuration || 1;
+            var timer = null;
 
-            scope.$watch('active', function(active) {
-                var timer;
+            function activateTimer() {
+                timer = $timeout(function() {
+                    $animate.animate(element, {opacity: 1}, {opacity: 0})
+                    .then(function() {
+                        scope.preload = false;
+                        scope.ended();
+                    });
+                }, delay);
+            }
 
-                if (active) {
+            function deactivateTimer() {
+                $timeout.cancel(timer);
+            }
+
+            scope.$watch('active', function(newVal, oldVal) {
+                if (newVal) {
                     $elem.css({
                         zIndex: 2,
-                        visibility: 'visible',
                         transition: 'opacity ' + timingFunc + ' ' + transitionDuration + 's'
                     });
 
-                    timer = $timeout(function() {
-                        $animate.animate(element, {opacity: 1}, {opacity: 0})
-                        .then(function() {
-                            scope.ended();
-                        });
-                    }, delay);
-                } else {
+                    if (!scope.loop) {
+                        activateTimer();
+                    }
+
+                    scope.loaded();
+                } else if (oldVal) {
                     $elem.css({
                         zIndex: 0,
-                        opacity: 1,
-                        visibility: 'hidden'
+                        opacity: 1
                     });
-                    $timeout.cancel(timer);
+                    deactivateTimer();
                 }
             });
 
-            scope.$watch('preload', function(preload) {
-                if (preload) {
-                    $elem.css({
-                        zIndex: 1,
-                        visibility: 'hidden'
-                    });
+            scope.$watch('preload', function(val) {
+                if (val) {
+                    $elem.css({zIndex: 1});
+                }
+            });
+
+            scope.$watch('loop', function(val) {
+                if (val) {
+                    deactivateTimer();
                 }
             });
         }

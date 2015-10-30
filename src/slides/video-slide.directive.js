@@ -35,7 +35,7 @@ module.exports = function($timeout, $animate) {
 
             function addEventListeners() {
                 $video.one('ended', onEnded);
-                $video.one('error', onEnded);
+                $video.one('error', onError);
                 $video.one('canplaythrough', onCanplay);
             }
 
@@ -46,11 +46,17 @@ module.exports = function($timeout, $animate) {
                         removeEventListeners();
                         scope.canPlay = false;
                         $video.removeAttr('src');
+                        $video[0].load();
                         $video = null;
                         scope.preload = false;
                         scope.ended();
                     });
                 }, 0);
+            }
+
+            function onError(event) {
+                console.info('Video error', new Date(), event.target.error, scope.src);
+                onEnded();
             }
 
             function onCanplay() {

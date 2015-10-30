@@ -17,7 +17,7 @@ module.exports = function() {
 
             $scope.play = function() {
                 var count = $scope.slides.length;
-
+                console.info('Start playing', new Date());
                 if (count === 0) {
                     return;
                 }

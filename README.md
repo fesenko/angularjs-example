@@ -27,7 +27,7 @@ The description of slide's posible parameters and their values is given below:
 - **type** - the slide type, which might be equal to *photo* or *video*;
 - **url** - the slide URL;
 - **duration** - the time during which a slide should be shown (applied for photos only);
-- **transition** - the animation type which should be applied during hiding the slide, currently supported values: *linear* and *unset*;
+- **transition** - the animation type which should be applied during hiding the slide, currently supported values are *linear* and *unset*;
 - **transitionDuration** - the time during which animation of the transitionis happening.
 
 

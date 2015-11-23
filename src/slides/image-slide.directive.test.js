@@ -14,7 +14,7 @@ require('./index');
 
 var mockModule = angular.mock.module;
 
-describe('Directive <image-slide>', function() {
+describe('Directive ImageSlide', function() {
     var $rootScope,
         $compile,
         $timeout,

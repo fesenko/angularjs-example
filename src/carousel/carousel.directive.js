@@ -7,30 +7,30 @@ module.exports = function() {
             slides: '=?'
         },
         templateUrl: 'carousel/carousel.html',
-        controller: function($scope, $timeout) {
-            var currentIndex = -1;
-            var currentSlide = null;
-            var nextIndex = -1;
-            var nextSlide = null;
-
+        controller: function($scope) {
+            $scope.currentIndex = -1;
+            $scope.nextIndex = -1;
+            $scope.currentSlide = null;
+            $scope.nextSlide = null;
             $scope.isPlaying = false;
 
             $scope.play = function() {
                 var count = $scope.slides.length;
-                console.info('Start playing', new Date());
+
                 if (count === 0) {
                     return;
                 }
 
-                currentIndex = 0;
-                currentSlide = $scope.slides[currentIndex];
-                currentSlide.active = true;
+                $scope.currentIndex = 0;
+                $scope.currentSlide = $scope.slides[$scope.currentIndex];
+                $scope.currentSlide.active = true;
 
                 if (count > 1) {
-                    nextIndex = getNextIndex();
-                    nextSlide = $scope.slides[nextIndex];
+                    $scope.nextIndex = $scope.getNextIndex();
+                    $scope.nextSlide = $scope.slides[$scope.nextIndex];
+                    $scope.nextSlide.preload = true;
                 } else {
-                    currentSlide.loop = true;
+                    $scope.currentSlide.loop = true;
                 }
 
                 $scope.isPlaying = true;
@@ -39,29 +39,24 @@ module.exports = function() {
             $scope.stop = function() {
                 $scope.isPlaying = false;
 
-                if (currentSlide) {
-                    delete currentSlide.active;
-                    delete currentSlide.loop;
+                if ($scope.currentSlide) {
+                    delete $scope.currentSlide.active;
+                    delete $scope.currentSlide.loop;
                 }
 
-                currentSlide = null;
-                currentIndex = -1;
-                nextSlide = null;
-                nextIndex = -1;
-            };
-
-            $scope.preloadNextSlide = function () {
-                if (nextSlide) {
-                    $timeout(function() {
-                        nextSlide.preload = true;
-                    }, 500);
+                if ($scope.nextSlide) {
+                    delete $scope.nextSlide.preload;
                 }
 
+                $scope.currentSlide = null;
+                $scope.currentIndex = -1;
+                $scope.nextSlide = null;
+                $scope.nextIndex = -1;
             };
 
-            function getNextIndex() {
+            $scope.getNextIndex = function() {
                 var count = $scope.slides.length;
-                var index = currentIndex + 1;
+                var index = $scope.currentIndex + 1;
 
                 if (index >= count) {
                     index = 0;
@@ -75,15 +70,16 @@ module.exports = function() {
                     return;
                 }
 
-                delete currentSlide.active;
+                delete $scope.currentSlide.active;
 
-                currentIndex = nextIndex;
-                currentSlide = nextSlide;
+                $scope.currentIndex = $scope.nextIndex;
+                $scope.currentSlide = $scope.nextSlide;
 
-                nextIndex = getNextIndex();
-                nextSlide = $scope.slides[nextIndex];
+                $scope.nextIndex = $scope.getNextIndex();
+                $scope.nextSlide = $scope.slides[$scope.nextIndex];
 
-                currentSlide.active = true;
+                $scope.nextSlide.preload = true;
+                $scope.currentSlide.active = true;
             };
         }
     };

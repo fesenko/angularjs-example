@@ -14,7 +14,7 @@ require('./index');
 
 var mockModule = angular.mock.module;
 
-describe('Directive <screensaver>', function() {
+describe('Directive Screensaver', function() {
     var $rootScope,
         $compile;
 
